@@ -1,10 +1,7 @@
 .idea/
 .DS_Store
-api_project/.env.local
-api_project/.env.local.php
-api_project/.env.*.local
-api_project/config/secrets/prod/prod.decrypt.private.php
-api_project/public/bundles/
-api_project/var/
-api_project/vendor/
-###< symfony/framework-bundle ###
+/api_project/.env
+/api_project/config/secrets/prod/prod.decrypt.private.php
+/api_project/public/bundles/
+/api_project/var/
+/api_project/vendor/
