@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProductController extends AbstractController
 {
@@ -20,36 +22,51 @@ class ProductController extends AbstractController
         $json = [];
         foreach ($products as $product){
             $json[] = [
+                "id" => $product->getId(),
                 "name" => $product->getName(),
                 "price" => $product->getPrice(),
                 "description" => $product->getDescription(),
             ];
         }
-        return $this->json(['products' => $json]);
+        return $this->json([
+                'code' => 200,
+                'data' => $json
+            ]
+        );
 
     }
 
     /**
      * @Route("/products", name="create_product", methods={"POST"})
      */
-    public function createProduct(): Response
+    public function createProduct(Request $request, ValidatorInterface $validator): Response
     {
-        // you can fetch the EntityManager via $this->getDoctrine()
-        // or you can add an argument to the action: createProduct(EntityManagerInterface $entityManager)
         $entityManager = $this->getDoctrine()->getManager();
 
         $product = new Product();
-        $product->setName('Keyboard');
-        $product->setPrice(1999);
-        $product->setDescription('Ergonomic and stylish!');
+        $parameters = json_decode($request->getContent(), true);
+        dd($request->getContent());
+        $product->setName($parameters['name']);
+        $product->setPrice($parameters['price']);
+        $product->setDescription($parameters['description']);
 
-        // tell Doctrine you want to (eventually) save the Product (no queries yet)
+        $errors = $validator->validate($product);
+        if (count($errors) > 0) {
+            return $this->json(['error' => (string) $errors], 400);
+        }
         $entityManager->persist($product);
-
-        // actually executes the queries (i.e. the INSERT query)
         $entityManager->flush();
 
-        return new Response('Saved new product with id '.$product->getId());
+        return $this->json([
+                'code' => 200,
+                'data' => [
+                    "id" => $product->getId(),
+                    "name" => $product->getName(),
+                    "price" => $product->getPrice(),
+                    "description" => $product->getDescription(),
+                ]
+            ]
+        );
     }
 
     /**
@@ -66,13 +83,14 @@ class ProductController extends AbstractController
                 'No product found for id '.$id
             );
         }
-
-        return $this->json(
-            ['product' => [
-                "name" => $product->getName(),
-                "price" => $product->getPrice(),
-                "description" => $product->getDescription(),
-            ]
+        return $this->json([
+                'code' => 200,
+                'data' => [
+                    "id" => $product->getId(),
+                    "name" => $product->getName(),
+                    "price" => $product->getPrice(),
+                    "description" => $product->getDescription(),
+                ]
             ]
         );
     }
@@ -93,13 +111,14 @@ class ProductController extends AbstractController
 
         $product->setName('New product name!');
         $entityManager->flush();
-
-        return $this->json(
-            ['product' => [
-                "name" => $product->getName(),
-                "price" => $product->getPrice(),
-                "description" => $product->getDescription(),
-            ]
+        return $this->json([
+                'code' => 200,
+                'data' => [
+                    "id" => $product->getId(),
+                    "name" => $product->getName(),
+                    "price" => $product->getPrice(),
+                    "description" => $product->getDescription(),
+                ]
             ]
         );
     }
@@ -107,7 +126,7 @@ class ProductController extends AbstractController
     /**
      * @Route("/products/{id}", methods={"DELETE"})
      */
-    public function delete(int $id)
+    public function delete(int $id): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $product = $entityManager->getRepository(Product::class)->find($id);
@@ -120,5 +139,10 @@ class ProductController extends AbstractController
 
         $entityManager->remove($product);
         $entityManager->flush();
+        return $this->json([
+                'code' => 200,
+                'data' => []
+            ]
+        );
     }
 }
