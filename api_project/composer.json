@@ -19,7 +19,8 @@
         "symfony/framework-bundle": "5.2.*",
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/validator": "5.2.*",
-        "symfony/yaml": "5.2.*"
+        "symfony/yaml": "5.2.*",
+        "webmozart/assert": "^1.9"
     },
     "config": {
         "optimize-autoloader": true,

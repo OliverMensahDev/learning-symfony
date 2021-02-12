@@ -2,35 +2,26 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductRepository;
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity(repositoryClass=ProductRepository::class)
- */
-class Product
+final class Product
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    private int $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $price;
+    private string $name;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $description;
+    private int $price;
+
+    private string $description;
+
+    public static function create(string $name, int $price, string $description): self
+    {
+        $self = new self();
+        $self->name = $name;
+        $self->price = $price;
+        $self->description = $description;
+
+        return $self;
+    }
 
     public function getId(): ?int
     {
@@ -42,34 +33,24 @@ class Product
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
 
     public function getPrice(): ?int
     {
         return $this->price;
     }
 
-    public function setPrice(int $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
 
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setId(int $id): void
     {
-        $this->description = $description;
+        $this->id = $id;
+    }
 
-        return $this;
+    private function __construct()
+    {
     }
 }
