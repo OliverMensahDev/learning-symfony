@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,14 +12,19 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProductController extends AbstractController
 {
+    private  ProductRepository $productRepository;
+
+    public function __construct(ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
+    }
     /**
      * @Route("/products", name="get_products", methods={"GET"})
      */
     public function index(): Response
     {
 
-        $repository = $this->getDoctrine()->getRepository(Product::class);
-        $products = $repository->findAll();
+        $products = $this->productRepository->findAll();
         $json = [];
         foreach ($products as $product){
             $json[] = [
@@ -45,7 +51,6 @@ class ProductController extends AbstractController
 
         $product = new Product();
         $parameters = json_decode($request->getContent(), true);
-        dd($request->getContent());
         $product->setName($parameters['name']);
         $product->setPrice($parameters['price']);
         $product->setDescription($parameters['description']);
@@ -74,9 +79,7 @@ class ProductController extends AbstractController
      */
     public function show(int $id): Response
     {
-        $product = $this->getDoctrine()
-            ->getRepository(Product::class)
-            ->find($id);
+        $product = $this->productRepository->find($id);
 
         if (!$product) {
             throw $this->createNotFoundException(
@@ -98,18 +101,20 @@ class ProductController extends AbstractController
     /**
      * @Route("/products/{id}", methods={"PUT"})
      */
-    public function update(int $id): Response
+    public function update(Request $request, int $id): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $product = $entityManager->getRepository(Product::class)->find($id);
+        $product = $this->productRepository->find($id);
 
         if (!$product) {
             throw $this->createNotFoundException(
                 'No product found for id '.$id
             );
         }
-
-        $product->setName('New product name!');
+        $parameters = json_decode($request->getContent(), true);
+        $product->setName(isset($parameters['name'])?$parameters['name']: $product->getName());
+        $product->setPrice(isset($parameters['price'])?$parameters['price']: $product->getPrice());
+        $product->setDescription(isset($parameters['description'])?$parameters['description']: $product->getDescription());
         $entityManager->flush();
         return $this->json([
                 'code' => 200,
@@ -129,7 +134,7 @@ class ProductController extends AbstractController
     public function delete(int $id): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $product = $entityManager->getRepository(Product::class)->find($id);
+        $product = $this->productRepository->find($id);
 
         if (!$product) {
             throw $this->createNotFoundException(
