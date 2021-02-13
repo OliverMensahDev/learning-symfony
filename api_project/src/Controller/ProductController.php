@@ -27,7 +27,7 @@ class ProductController extends AbstractController
         $json = [];
         foreach ($products as $product){
             $json[] = [
-                "id" => $product->getId(),
+                "id" => $product->getId()->toString(),
                 "name" => $product->getName(),
                 "price" => $product->getPrice(),
                 "description" => $product->getDescription(),
@@ -48,6 +48,7 @@ class ProductController extends AbstractController
     {
         $parameters = json_decode($request->getContent(), true);
         $this->productRepository->save(Product::create(
+            $this->productRepository->productIdentity(),
             $parameters['name'],
             $parameters['price'],
             $parameters['description']
@@ -74,7 +75,7 @@ class ProductController extends AbstractController
         return $this->json([
                 'code' => 200,
                 'data' => [
-                    "id" => $product->getId(),
+                    "id" => $product->getId()->toString(),
                     "name" => $product->getName(),
                     "price" => $product->getPrice(),
                     "description" => $product->getDescription(),
@@ -96,16 +97,16 @@ class ProductController extends AbstractController
         }
         $parameters = json_decode($request->getContent(), true);
         $newProduct = Product::create(
+            $this->productRepository->productIdentity(),
             isset($parameters['name'])?$parameters['name']:$product->getName(),
         isset($parameters['price'])?$parameters['price']: $product->getPrice(),
             isset($parameters['description'])?$parameters['description']: $product->getDescription()
         );
-        $newProduct->setId($product->getId());
         $this->productRepository->update($newProduct);
         return $this->json([
                 'code' => 200,
                 'data' => [
-                    "id" => $newProduct->getId(),
+                    "id" => $product->getId()->toString(),
                     "name" => $newProduct->getName(),
                     "price" => $newProduct->getPrice(),
                     "description" => $newProduct->getDescription(),

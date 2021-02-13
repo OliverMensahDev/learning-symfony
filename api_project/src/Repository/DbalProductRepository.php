@@ -5,11 +5,10 @@ namespace App\Repository;
 
 
 use App\Entity\Product;
+use App\Entity\ProductId;
 use App\Entity\Products;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\FetchMode;
-use Sportcity\Api\ApiManagement\Domain\License;
-use Sportcity\Api\Shared\Infrastructure\DoctrineDbal\MappingTypes\CustomTypes;
 
 final class DbalProductRepository implements ProductRepository
 {
@@ -66,12 +65,14 @@ final class DbalProductRepository implements ProductRepository
                     'name' => ':name',
                     'price' => ':price',
                     'description' => ':description',
+                    'product_uuid' => ':uuid'
                 ]
             )->setParameters(
                 [
                     'name' => $product->getName(),
                     'price' => $product->getPrice(),
                     'description' => $product->getDescription(),
+                    'uuid' => $product->getId()->toString()
                 ]
             )->execute();
     }
@@ -85,14 +86,13 @@ final class DbalProductRepository implements ProductRepository
             ->set('name', ':name')
             ->set('price', ':price')
             ->set('description', ':description')
-            ->where('id = :id')
+            ->where('product_id = :id')
             ->setParameters(
                 [
                     'id' => $product->getId(),
                     'name' => $product->getName(),
                     'price' => $product->getPrice(),
-                    'description' => $product->getDescription(),
-
+                    'description' => $product->getDescription()
                 ]
             );
 
@@ -117,12 +117,16 @@ final class DbalProductRepository implements ProductRepository
 
     private function hydrate(array $row): Product
     {
-        $product= Product::create(
+        return Product::create(
+            ProductId::fromString($row['product_id']),
             $row['name'],
             (int) $row['price'],
             $row['description']
         );
-        $product->setId($row['id']);
-        return $product;
+    }
+
+    public function productIdentity(): ProductId
+    {
+        return ProductId::generate();
     }
 }
