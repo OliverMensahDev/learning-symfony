@@ -5,7 +5,7 @@ namespace App\Entity;
 
 
 
-class ProductId extends Uuid
+final class ProductId extends Uuid
 {
 
 }

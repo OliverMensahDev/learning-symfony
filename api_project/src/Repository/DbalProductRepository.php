@@ -65,7 +65,7 @@ final class DbalProductRepository implements ProductRepository
                     'name' => ':name',
                     'price' => ':price',
                     'description' => ':description',
-                    'product_uuid' => ':uuid'
+                    'product_id' => ':uuid'
                 ]
             )->setParameters(
                 [

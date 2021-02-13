@@ -2,20 +2,27 @@
 
 namespace App\Controller;
 
+use App\Commands\CreateProduct;
+use App\Commands\DeleteProduct;
+use App\Commands\UpdateProduct;
 use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ProductController extends AbstractController
+final class ProductController extends AbstractController
 {
     private  ProductRepository $productRepository;
 
-    public function __construct(ProductRepository $productRepository)
+    private MessageBusInterface $commandBus;
+
+    public function __construct(ProductRepository $productRepository, MessageBusInterface $commandBus)
     {
         $this->productRepository = $productRepository;
+        $this->commandBus = $commandBus;
     }
     /**
      * @Route("/products", name="get_products", methods={"GET"})
@@ -47,15 +54,18 @@ class ProductController extends AbstractController
     public function createProduct(Request $request): Response
     {
         $parameters = json_decode($request->getContent(), true);
-        $this->productRepository->save(Product::create(
-            $this->productRepository->productIdentity(),
+        $productId = $this->productRepository->productIdentity();
+        $this->commandBus->dispatch(CreateProduct::fromRequest(
+            $productId->toString(),
             $parameters['name'],
             $parameters['price'],
             $parameters['description']
         ));
         return $this->json([
                 'code' => 200,
-                'data' => []
+                'data' => [
+                    'id' => $productId->toString()
+                ]
             ]
         );
     }
@@ -96,20 +106,16 @@ class ProductController extends AbstractController
             );
         }
         $parameters = json_decode($request->getContent(), true);
-        $newProduct = Product::create(
-            $this->productRepository->productIdentity(),
+        $this->commandBus->dispatch(UpdateProduct::fromRequest(
+            $product->getId()->toString(),
             isset($parameters['name'])?$parameters['name']:$product->getName(),
-        isset($parameters['price'])?$parameters['price']: $product->getPrice(),
+            isset($parameters['price'])?$parameters['price']: $product->getPrice(),
             isset($parameters['description'])?$parameters['description']: $product->getDescription()
-        );
-        $this->productRepository->update($newProduct);
+        ));
         return $this->json([
                 'code' => 200,
                 'data' => [
-                    "id" => $product->getId()->toString(),
-                    "name" => $newProduct->getName(),
-                    "price" => $newProduct->getPrice(),
-                    "description" => $newProduct->getDescription(),
+                    'id' => $product->getId()->toString()
                 ]
             ]
         );
@@ -120,7 +126,14 @@ class ProductController extends AbstractController
      */
     public function delete(int $id): Response
     {
-        $this->productRepository->delete($id);
+        $product = $this->productRepository->find($id);
+        if (!$product) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$id
+            );
+        }
+
+       $this->commandBus->dispatch(DeleteProduct::create($id));
         return $this->json([
                 'code' => 200,
                 'data' => []
