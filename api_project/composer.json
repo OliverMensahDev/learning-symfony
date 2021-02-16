@@ -4,9 +4,10 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "codeception/module-rest": "^1.2",
         "composer/package-versions-deprecated": "1.11.99.1",
         "doctrine/annotations": "^1.11",
         "doctrine/doctrine-bundle": "^2.2",
@@ -20,6 +21,7 @@
         "symfony/framework-bundle": "5.2.*",
         "symfony/messenger": "5.2.*",
         "symfony/proxy-manager-bridge": "5.2.*",
+        "symfony/twig-bundle": "5.2.*",
         "symfony/validator": "5.2.*",
         "symfony/yaml": "5.2.*",
         "webmozart/assert": "^1.9"
@@ -68,6 +70,11 @@
         }
     },
     "require-dev": {
+        "codeception/codeception": "^4.1",
+        "codeception/module-asserts": "^1.0.0",
+        "codeception/module-db": "^1.1",
+        "codeception/module-phpbrowser": "^1.0.0",
+        "codeception/module-symfony": "^2.0",
         "symfony/maker-bundle": "^1.29"
     }
 }

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Symfony!</title>
+</head>
+<body>
+<h1>Products List</h1>
+<ul>
+    {% for product in products %}
+        <li>{{ product.name|e }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>

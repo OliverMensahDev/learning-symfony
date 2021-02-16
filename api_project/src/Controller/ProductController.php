@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Commands\CreateProduct;
 use App\Commands\DeleteProduct;
 use App\Commands\UpdateProduct;
-use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +23,28 @@ final class ProductController extends AbstractController
         $this->productRepository = $productRepository;
         $this->commandBus = $commandBus;
     }
+
+    /**
+     * @Route("/")
+     */
+    public function page(): Response
+    {
+        $products = $this->productRepository->findAll();
+        $json = [];
+        foreach ($products as $product){
+            $json[] = [
+                "id" => $product->getId()->toString(),
+                "name" => $product->getName(),
+                "price" => $product->getPrice(),
+                "description" => $product->getDescription(),
+            ];
+        }
+
+        return $this->render('products/index.html.twig', [
+            'products' => $json,
+        ]);
+    }
+
     /**
      * @Route("/products", name="get_products", methods={"GET"})
      */

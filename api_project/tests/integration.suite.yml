@@ -1,0 +1,26 @@
+# Codeception Test Suite Configuration
+#
+# Suite for functional tests
+# Emulate web requests and make application process them
+# Include one of framework modules (Symfony2, Yii2, Laravel5, Phalcon4) to use it
+# Remove this suite if you don't use frameworks
+
+actor: FunctionalTester
+modules:
+    enabled:
+        - REST:
+              url: https://127.0.0.1:8000/
+              depends:
+                - PhpBrowser
+              part: Json
+        - \Helper\Functional
+        - Db
+    config:
+      Db:
+        dsn: 'mysql:host=127.0.0.1;dbname=iad_db_s'
+        user: root
+        password: oli@MEN2018
+#        dump: tests/_data/database_structure.sql
+        populate: true
+        cleanup: false
+    step_decorators: ~        
