@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Commands\CreateProduct;
 use App\Commands\DeleteProduct;
 use App\Commands\UpdateProduct;
+use App\Entity\ProductId;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,9 +95,9 @@ final class ProductController extends AbstractController
     /**
      * @Route("/products/{id}", name="product_show", methods={"GET"})
      */
-    public function show(int $id): Response
+    public function show(string $id): Response
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productRepository->find(ProductId::fromString($id));
 
         if (!$product) {
             throw $this->createNotFoundException(
@@ -118,9 +119,9 @@ final class ProductController extends AbstractController
     /**
      * @Route("/products/{id}", methods={"PUT"})
      */
-    public function update(Request $request, int $id): Response
+    public function update(Request $request, string $id): Response
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productRepository->find(ProductId::fromString($id));
         if (!$product) {
             throw $this->createNotFoundException(
                 'No product found for id '.$id
@@ -145,9 +146,9 @@ final class ProductController extends AbstractController
     /**
      * @Route("/products/{id}", methods={"DELETE"})
      */
-    public function delete(int $id): Response
+    public function delete(string $id): Response
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productRepository->find(ProductId::fromString($id));
         if (!$product) {
             throw $this->createNotFoundException(
                 'No product found for id '.$id

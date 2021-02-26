@@ -12,7 +12,7 @@ use App\Repository\ProductRepository;
 class ProductRepositoryMock implements ProductRepository
 {
 
-    public function find(int $id): ?Product
+    public function find(ProductId $id): ?Product
     {
         // TODO: Implement find() method.
     }
@@ -32,7 +32,7 @@ class ProductRepositoryMock implements ProductRepository
         // TODO: Implement update() method.
     }
 
-    public function delete(int $id): void
+    public function delete(ProductId $id): void
     {
         // TODO: Implement delete() method.
     }

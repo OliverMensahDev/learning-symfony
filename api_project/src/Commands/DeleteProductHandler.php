@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Entity\ProductId;
 use App\Events\ProductWasDeleted;
 use App\Repository\ProductRepository;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -21,7 +22,7 @@ final class DeleteProductHandler implements MessageHandlerInterface
 
     public function __invoke(DeleteProduct $command)
     {
-        $this->productRepository->delete($command->id());
+        $this->productRepository->delete(ProductId::fromString($command->id()));
         $this->eventBus->dispatch(ProductWasDeleted::create($command->id()));
     }
 }

@@ -4,9 +4,9 @@ namespace App\Events;
 
 final class ProductWasDeleted
 {
-    private int $id;
+    private string $id;
 
-    public static function create(int $id): self
+    public static function create(string $id): self
     {
         $self = new self;
         $self->id = $id;
@@ -14,7 +14,7 @@ final class ProductWasDeleted
         return $self;
     }
 
-    public function id(): int
+    public function id(): string
     {
         return $this->id;
     }

@@ -19,15 +19,15 @@ final class DbalProductRepository implements ProductRepository
         $this->connection = $connection;
     }
 
-    public function find(int $id): ?Product
+    public function find(ProductId $id): ?Product
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
         $queryBuilder
             ->select('*')
             ->from('product')
-            ->where('id = :id')
-            ->setParameter('id', $id);
+            ->where('product_id = :id')
+            ->setParameter('id', $id->toString());
         $queryStatement = $queryBuilder->execute();
 
         $row = $queryStatement->fetch(FetchMode::ASSOCIATIVE);
@@ -65,14 +65,14 @@ final class DbalProductRepository implements ProductRepository
                     'name' => ':name',
                     'price' => ':price',
                     'description' => ':description',
-                    'product_id' => ':uuid'
+                    'product_id' => ':id'
                 ]
             )->setParameters(
                 [
                     'name' => $product->getName(),
                     'price' => $product->getPrice(),
                     'description' => $product->getDescription(),
-                    'uuid' => $product->getId()->toString()
+                    'id' => $product->getId()->toString()
                 ]
             )->execute();
     }
@@ -89,7 +89,7 @@ final class DbalProductRepository implements ProductRepository
             ->where('product_id = :id')
             ->setParameters(
                 [
-                    'id' => $product->getId(),
+                    'id' => $product->getId()->toString(),
                     'name' => $product->getName(),
                     'price' => $product->getPrice(),
                     'description' => $product->getDescription()
@@ -99,16 +99,16 @@ final class DbalProductRepository implements ProductRepository
         $queryBuilder->execute();
     }
 
-    public function delete(int $id): void
+    public function delete(ProductId $id): void
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
         $queryBuilder
             ->delete('product')
-            ->where('id = :id')
+            ->where('product_id = :id')
             ->setParameters(
                 [
-                    'id' => $id
+                    'id' => $id->toString()
                 ]
             );
 
